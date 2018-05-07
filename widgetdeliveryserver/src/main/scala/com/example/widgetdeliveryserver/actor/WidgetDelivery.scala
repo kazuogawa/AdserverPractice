@@ -11,7 +11,10 @@ object WidgetDelivery {
   case class Edit(widget:Widget)
   case class Delete(widgetId:Int)
 
-  sealed trait EventResponce
-  case class WidgetCreated(widget: Widget) extends EventResponce
-  case object WidgetExists extends EventResponce
+  sealed trait EventResponse
+  case class WidgetCreated(widget: Widget) extends EventResponse
+  case object WidgetExists extends EventResponse
+  case class WidgetDeleted(widgetId:Int) extends EventResponse
+  case class WidgetNotFound(widgetId:Int) extends EventResponse
+  case object WidgetIdIsNotNumeric extends EventResponse
 }

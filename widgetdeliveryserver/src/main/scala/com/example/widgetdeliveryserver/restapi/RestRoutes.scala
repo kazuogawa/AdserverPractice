@@ -2,20 +2,21 @@ package com.example.widgetdeliveryserver.restapi
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.event.Logging
-import akka.http.scaladsl.model.{StatusCode, StatusCodes}
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
 import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.duration._
+import com.example.common.Convert._
 import com.example.widgetdeliveryserver.actor.WidgetDelivery._
 import com.example.widgetdeliveryserver.actor.WidgetJsonProtocol._
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 
-trait RestRoutes {//extends WidgetDeliveryApi{
+trait RestRoutes {
 
   def widgetDeliveryServerActor:ActorRef
 
@@ -30,30 +31,39 @@ trait RestRoutes {//extends WidgetDeliveryApi{
   //PUT ・・replace
   //DLETE・・delete
   val route: Route = {
-    pathPrefix("widget" / Segments){json =>
+    pathPrefix("widget" / Segments){param =>
       post {
         entity(as[Widget]){widget =>
           log.info("jsonで渡された値：" + widget.toString)
-          val responce:Future[EventResponce] = (widgetDeliveryServerActor ? Create(widget)).mapTo[EventResponce]
-          onSuccess(responce) {
-            case WidgetCreated(_) => complete(StatusCodes.OK, "created widget")
+          val response:Future[EventResponse] = (widgetDeliveryServerActor ? Create(widget)).mapTo[EventResponse]
+          onSuccess(response) {
+            case WidgetCreated(createdWidget)
+                              => complete(StatusCodes.OK , s"created ${createdWidget.widgetId} widget")
             //StatusCodeはConflictの方がいい？
             case WidgetExists => complete(StatusCodes.BadRequest, "widget is exists")
-            case _ => complete(StatusCodes.BadRequest, "request error")
+            case _            => complete(StatusCodes.BadRequest, "create request error")
           }
         }
       } ~
       get {
         //TODO:WidgetDeliveryServerActorを取得する処理
-        complete(json.toString)
+        complete(param.toString)
       } ~
       put {
         //TODO:WidgetDeliveryServerActorを編集する処理
-        complete(json.toString)
+        complete(param.toString)
       } ~
       delete {
-        //TODO:WidgetDeliveryServerActorを削除する処理
-        complete(json.toString)
+        val response: Future[EventResponse] = safeStringToInt(param.head) match {
+          case Some(widgetId) => (widgetDeliveryServerActor ? Delete(widgetId)).mapTo[EventResponse]
+          case None           => Future(WidgetIdIsNotNumeric)
+        }
+        onSuccess(response) {
+          case WidgetDeleted(widgetId)  => complete(StatusCodes.OK        , s"delete $widgetId widget")
+          case WidgetNotFound(widgetId) => complete(StatusCodes.NotFound  , s"$widgetId widget is not found")
+          case WidgetIdIsNotNumeric     => complete(StatusCodes.BadRequest, "request widgetId is not numeric")
+          case _                        => complete(StatusCodes.BadRequest, "delete request error")
+        }
       }
     }
   }
