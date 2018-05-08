@@ -3,33 +3,37 @@ package com.example.widgetdeliveryserver.actor
 import akka.actor.Actor
 import com.example.widgetdeliveryserver.actor.WidgetDelivery._
 
-
 class WidgetDeliveryServerActor extends Actor{
   var widgets = Vector.empty[Widget]
   override def receive: Receive = {
     case Create(postWidget)     => {
       if(widgets.contains(postWidget)) WidgetExists
       else {
-        widgets :+ postWidget
+        widgets = widgets :+ postWidget
         sender() ! WidgetCreated(postWidget)
       }
     }
       //TODO:Get処理をかく
     case Get(widgetId)    =>
-    //TODO:Edit処理をかく
-    case Edit(json)       =>
-    //TODO:Delete処理をかく
-    case Delete(widgetId) => {
+    case Edit(postWidget) =>
+      val widgetOpt = widgets.find(_.widgetId == postWidget.widgetId)
+      widgetOpt match {
+        case Some(widget) =>
+          //1回で終わらせられる方法があれば、書き換える
+          widgets = widgets filterNot widget.==
+          widgets = widgets :+ postWidget
+          sender() ! WidgetEdited(postWidget)
+        case None => sender() ! WidgetNotFound
+      }
+    case Delete(widgetId) =>
       val widgetOpt: Option[Widget] = widgets.find(_.widgetId == widgetId)
       widgetOpt match {
-        //消えているか要確認
-        case Some(widget) => {
-          widgets filterNot widget.==
+        case Some(widget) =>
+          widgets = widgets filterNot widget.==
           sender() ! WidgetDeleted(widgetId)
-        }
         case None => sender() ! WidgetNotFound(widgetId)
       }
-    }
-    case _ => println("error")
+    case WidgetList       => sender() ! Widgets(widgets)
+    case _                => println("error")
   }
 }

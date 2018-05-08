@@ -31,10 +31,18 @@ trait RestRoutes {
   //PUT ・・replace
   //DLETE・・delete
   val route: Route = {
+    pathPrefix("widget" / "list"){
+      get {
+        val response:Future[Widgets] = (widgetDeliveryServerActor ? WidgetList).mapTo[Widgets]
+        onSuccess(response) {
+          case widgets:Widgets => complete(widgets)
+          case _               => complete(StatusCodes.NotFound, "widgets is not found")
+        }
+      }
+    } ~
     pathPrefix("widget" / Segments){param =>
       post {
         entity(as[Widget]){widget =>
-          log.info("jsonで渡された値：" + widget.toString)
           val response:Future[EventResponse] = (widgetDeliveryServerActor ? Create(widget)).mapTo[EventResponse]
           onSuccess(response) {
             case WidgetCreated(createdWidget)
@@ -50,8 +58,13 @@ trait RestRoutes {
         complete(param.toString)
       } ~
       put {
-        //TODO:WidgetDeliveryServerActorを編集する処理
-        complete(param.toString)
+        entity(as[Widget]){widget =>
+          val response:Future[EventResponse] = (widgetDeliveryServerActor ? Edit(widget)).mapTo[EventResponse]
+          onSuccess(response) {
+            case WidgetEdited(editWidget) => complete(StatusCodes.OK, s"widget with id ${editWidget.widgetId} is edited")
+            case _                        => complete(StatusCodes.NotFound, s"widget with id ${widget.widgetId} is not found")
+          }
+        }
       } ~
       delete {
         val response: Future[EventResponse] = safeStringToInt(param.head) match {
