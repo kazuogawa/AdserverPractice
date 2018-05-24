@@ -13,8 +13,12 @@ class WidgetDeliveryServerActor extends Actor{
         sender() ! WidgetCreated(postWidget)
       }
     }
-      //TODO:Get処理をかく
     case Get(widgetId)    =>
+      val widgetOpt: Option[Widget] = widgets.find(_.widgetId == widgetId)
+      widgetOpt match {
+        case Some(widget) => sender() ! WidgetResponse(widget.widgetId,widget.adSlotNum,widget.recoSlotNum)
+        case None         => sender() ! WidgetNotFound
+    }
     case Edit(postWidget) =>
       val widgetOpt = widgets.find(_.widgetId == postWidget.widgetId)
       widgetOpt match {
@@ -31,7 +35,7 @@ class WidgetDeliveryServerActor extends Actor{
         case Some(widget) =>
           widgets = widgets filterNot widget.==
           sender() ! WidgetDeleted(widgetId)
-        case None => sender() ! WidgetNotFound(widgetId)
+        case None => sender() ! WidgetNotFound
       }
     case WidgetList       => sender() ! Widgets(widgets)
     case _                => println("error")

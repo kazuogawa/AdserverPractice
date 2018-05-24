@@ -1,35 +1,34 @@
 package com.example.widgetdeliveryserver
 
-import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.actor._
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.HttpApp
-import akka.stream.ActorMaterializer
-import com.example.common.actorConfig.WidgetDeliveryServerConfig
-import com.example.common.AkkaConfig
+import com.example.common.actorConfig.WidgetDeliveryServerRestApiConfig._
 import com.example.widgetdeliveryserver.actor.WidgetDeliveryServerActor
 import com.example.widgetdeliveryserver.restapi.RestRoutes
 import akka.stream.ActorMaterializer
+import com.example.common.actorConfig.{AdServerConfig, RecommendServerConfig}
 
 import scala.io.StdIn
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 object Main extends App with RestRoutes {
-  val akkaConfig = new AkkaConfig
-  val config:WidgetDeliveryServerConfig = akkaConfig.widgetDeliveryServerConf
 
   //これをimplicitしないとbindAndHandleできなかった
-  implicit val actorSystem: ActorSystem  = ActorSystem("widgetDeliveryServer")
+  implicit val widgetDeliveryServerActorSystem: ActorSystem  = ActorSystem("widgetDeliveryServer", WidgetDeliveryServerConfig)
   implicit val materializer: ActorMaterializer = ActorMaterializer()
-  //
-  val widgetDeliveryServerActor: ActorRef = actorSystem.actorOf(Props[WidgetDeliveryServerActor])
-  implicit val executionContext: ExecutionContextExecutor = actorSystem.dispatcher
-  val bindingFuture:Future[ServerBinding] = Http().bindAndHandle(route,config.host,config.port.toInt)
+
+  val widgetDeliveryServerActor: ActorRef = widgetDeliveryServerActorSystem.actorOf(Props[WidgetDeliveryServerActor])
+  implicit val executionContext: ExecutionContextExecutor = widgetDeliveryServerActorSystem.dispatcher
+  val bindingFuture:Future[ServerBinding] = Http().bindAndHandle(route,restConfig.host,restConfig.port.toInt)
+
+
+  implicit val adServerActorSystem: ActorSelection = widgetDeliveryServerActorSystem.actorSelection(AdServerConfig.adServerPath)
+  implicit val recoServerActorSystem: ActorSelection = widgetDeliveryServerActorSystem.actorSelection(RecommendServerConfig.recoServerPath)
+
+
   StdIn.readLine() // let it run until user presses return
   bindingFuture
     .flatMap(_.unbind()) // trigger unbinding from the port
-    .onComplete(_ => actorSystem.terminate()) // and shutdown when done
+    .onComplete(_ => widgetDeliveryServerActorSystem.terminate()) // and shutdown when done
 }

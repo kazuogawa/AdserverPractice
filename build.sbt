@@ -7,16 +7,18 @@ val commonSettings = Seq(
     val akkaVersion = "2.5.12"
     val akkaHttpVersion = "10.1.1"
     Seq(
-      "com.typesafe.akka" %% "akka-actor"           % akkaVersion,
-      "com.typesafe.akka" %% "akka-testkit"         % akkaVersion % Test,
-      "com.typesafe.akka" %% "akka-http"            % akkaHttpVersion,
-      "com.typesafe.akka" %% "akka-http-testkit"    % akkaHttpVersion % Test,
-      "com.typesafe.akka" %% "akka-stream"          % akkaVersion,
-      "com.typesafe.akka" %% "akka-stream-testkit"  % akkaVersion % Test,
-      "org.scalatest"     %% "scalatest"            % "3.0.5",
-      "com.typesafe"      %  "config"               % "1.3.2",
+      "com.typesafe.akka" %% "akka-actor"              % akkaVersion,
+      "com.typesafe.akka" %% "akka-testkit"            % akkaVersion % Test,
+      "com.typesafe.akka" %% "akka-http"               % akkaHttpVersion,
+      "com.typesafe.akka" %% "akka-http-testkit"       % akkaHttpVersion % Test,
+      "com.typesafe.akka" %% "akka-stream"             % akkaVersion,
+      "com.typesafe.akka" %% "akka-stream-testkit"     % akkaVersion % Test,
+      "org.scalatest"     %% "scalatest"               % "3.0.5",
+      "com.typesafe"      %  "config"                  % "1.3.2",
+      "com.typesafe.akka" %% "akka-http-spray-json"    % akkaHttpVersion,
+      "com.typesafe.akka" %% "akka-remote"             % akkaVersion,
+      "com.typesafe.akka" %% "akka-multi-node-testkit" % akkaVersion % Test,
       //使い方を理解してからコメントを外すこと
-      "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-slf4j"           % akkaVersion,
       "ch.qos.logback"    %  "logback-classic"      % "1.2.3"
     )
