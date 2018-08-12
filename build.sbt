@@ -19,8 +19,9 @@ val commonSettings = Seq(
       "com.typesafe.akka" %% "akka-remote"             % akkaVersion,
       "com.typesafe.akka" %% "akka-multi-node-testkit" % akkaVersion % Test,
       //使い方を理解してからコメントを外すこと
-      "com.typesafe.akka" %% "akka-slf4j"           % akkaVersion,
-      "ch.qos.logback"    %  "logback-classic"      % "1.2.3"
+      "com.typesafe.akka" %% "akka-slf4j"              % akkaVersion,
+      "ch.qos.logback"    %  "logback-classic"         % "1.2.3",
+      "net.debasishg"     %% "redisclient"             % "3.7"
     )
   }
 )
@@ -28,7 +29,7 @@ val commonSettings = Seq(
 lazy val common               = (project in file("common")).settings(
   organization := "scala.example.common",
   commonSettings
-)
+).enablePlugins(FlywayPlugin)
 
 lazy val adserver             = (project in file("adserver")).settings(
   organization := "scala.example.adserver",

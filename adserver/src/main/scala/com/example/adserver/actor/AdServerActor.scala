@@ -1,9 +1,11 @@
 package com.example.adserver.actor
 
 import akka.actor.Actor
+import com.example.common.domain.model.WidgetDelivery.WidgetAdPost
 
 class AdServerActor extends Actor{
   override def receive: Receive = {
-    case m => println(s"received message $m")
+    case WidgetAdPost(widgetId:Int, adSlotNum:Int) =>
+    case _ =>
   }
 }

@@ -27,6 +27,8 @@ object Main extends App with RestRoutes {
   implicit val recoServerActorSystem: ActorSelection = widgetDeliveryServerActorSystem.actorSelection(RecommendServerConfig.recoServerPath)
 
 
+  //schedulerで定期的に、redisからデータを読み込む
+
   StdIn.readLine() // let it run until user presses return
   bindingFuture
     .flatMap(_.unbind()) // trigger unbinding from the port

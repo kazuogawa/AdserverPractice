@@ -1,7 +1,7 @@
 package com.example.widgetdeliveryserver.actor
 
 import akka.actor.Actor
-import com.example.widgetdeliveryserver.actor.WidgetDelivery._
+import com.example.common.domain.model.WidgetDelivery._
 
 class WidgetDeliveryServerActor extends Actor{
   var widgets = Vector.empty[Widget]

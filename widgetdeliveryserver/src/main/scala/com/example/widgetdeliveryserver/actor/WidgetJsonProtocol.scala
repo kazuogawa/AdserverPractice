@@ -1,7 +1,7 @@
 package com.example.widgetdeliveryserver.actor
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import com.example.widgetdeliveryserver.actor.WidgetDelivery._
+import com.example.common.domain.model.WidgetDelivery._
 import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 import com.example.common.parser.SlotJsonProtocol._
 

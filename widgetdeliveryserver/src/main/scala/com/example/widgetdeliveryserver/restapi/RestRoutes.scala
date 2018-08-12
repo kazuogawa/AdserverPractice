@@ -11,7 +11,7 @@ import akka.util.Timeout
 import scala.concurrent.duration._
 import com.example.common.Convert._
 import com.example.common.domain.model.Slots._
-import com.example.widgetdeliveryserver.actor.WidgetDelivery._
+import com.example.common.domain.model.WidgetDelivery._
 import com.example.widgetdeliveryserver.actor.WidgetJsonProtocol._
 
 import scala.concurrent.Future
@@ -68,16 +68,19 @@ trait RestRoutes {
         onSuccess(response) {
           case WidgetResponse(widgetId, adSlotNum, recoSlotNum) =>
             //adのみ、recoのみの場合即座に返せるように
+            //TODO:通信が失敗した時どのように届くかを決めていない
             val adServerResponse  :Future[AdSlots] =
               if(adSlotNum > 0) (adServerActorSystem ? WidgetAdPost(widgetId,adSlotNum)).mapTo[AdSlots]
               else Future(AdSlots(widgetId, Nil))
             val recoServerResponse:Future[RecommendSlots] =
               if(recoSlotNum > 0) (recoServerActorSystem ? WidgetRecommendPost(widgetId,recoSlotNum)).mapTo[RecommendSlots]
               else Future(RecommendSlots(widgetId, Nil))
+
             val widgetdataResponse:Future[WidgetData] = for {
               adSlots:AdSlots          <- adServerResponse
               recoSlots:RecommendSlots <- recoServerResponse
             } yield WidgetData(widgetId, adSlots.slots, recoSlots.slots)
+
             complete(StatusCodes.OK,widgetdataResponse)
           case _ => complete(StatusCodes.NotFound, "widget is not found")
         }
