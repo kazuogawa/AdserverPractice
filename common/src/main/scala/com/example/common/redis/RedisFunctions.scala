@@ -1,4 +1,4 @@
-package com.example.widgetdeliveryserver.redis
+package com.example.common.redis
 
 import org.slf4j.{Logger, LoggerFactory}
 

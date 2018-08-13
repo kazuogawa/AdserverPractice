@@ -4,7 +4,7 @@ val commonSettings = Seq(
   version := "0.1",
   scalaVersion := "2.12.5",
   libraryDependencies ++= {
-    val akkaVersion = "2.5.12"
+    val akkaVersion = "2.5.14"
     val akkaHttpVersion = "10.1.1"
     Seq(
       "com.typesafe.akka" %% "akka-actor"              % akkaVersion,
@@ -18,10 +18,10 @@ val commonSettings = Seq(
       "com.typesafe.akka" %% "akka-http-spray-json"    % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-remote"             % akkaVersion,
       "com.typesafe.akka" %% "akka-multi-node-testkit" % akkaVersion % Test,
-      //使い方を理解してからコメントを外すこと
       "com.typesafe.akka" %% "akka-slf4j"              % akkaVersion,
       "ch.qos.logback"    %  "logback-classic"         % "1.2.3",
-      "net.debasishg"     %% "redisclient"             % "3.7"
+      "net.debasishg"     %% "redisclient"             % "3.7",
+      "com.github.scopt"  %% "scopt"                   % "3.7.0"
     )
   }
 )

@@ -1,4 +1,4 @@
-package com.example.common.actorConfig
+package com.example.common.config
 
 import com.typesafe.config.{Config, ConfigFactory}
 

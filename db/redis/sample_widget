@@ -1,0 +1,4 @@
+sadd widgetids 12345
+hset widgetid:12345:slotnum ad_slot_num 3
+hset widgetid:12345:slotnum reco_slot_num 2
+

@@ -9,17 +9,19 @@ object WidgetDelivery {
     recoSlotNum:Int
   )
   case class Widgets(widgets:Seq[Widget])
+  case object WidgetsInit
+  case object WidgetsUpdate
   case class Create(widget:Widget)
-  case class Get(widgetId:Int)
+  case class Get(widgetId:String)
   case class Edit(widget:Widget)
-  case class Delete(widgetId:Int)
+  case class Delete(widgetId:String)
   case object WidgetList
   case class WidgetAdPost(
-    widgetId :Int,
+    widgetId :String,
     adSlotNum:Int
   )
   case class WidgetRecommendPost(
-    widgetId:Int,
+    widgetId:String,
     recoSlotNum:Int
   )
 
@@ -28,10 +30,10 @@ object WidgetDelivery {
   //TODO:もっといい名前を見つける
   case class  WidgetResponse(widgetId:String, adSlotNum:Int, recoSlotNum:Int) extends EventResponse
   //TODO:もっといい名前を見つける
-  case class  WidgetData(widgetId:Int, adSlots:List[AdSlot],recommendSlots:List[RecommendSlot]) extends EventResponse
+  case class  WidgetData(widgetId:String, adSlots:List[AdSlot],recommendSlots:List[RecommendSlot]) extends EventResponse
   case class  WidgetEdited(widget:Widget) extends EventResponse
   case object WidgetExists extends EventResponse
-  case class  WidgetDeleted(widgetId:Int) extends EventResponse
+  case class  WidgetDeleted(widgetId:String) extends EventResponse
   object      WidgetNotFound extends EventResponse
   case object WidgetIdIsNotNumeric extends EventResponse
 }

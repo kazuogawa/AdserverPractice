@@ -2,17 +2,32 @@ package com.example.widgetdeliveryserver.actor
 
 import akka.actor.Actor
 import com.example.common.domain.model.WidgetDelivery._
+import com.example.common.redis.redisConfig
+import com.example.widgetdeliveryserver.redis.RedisWidget
+import org.slf4j.{Logger, LoggerFactory}
 
-class WidgetDeliveryServerActor extends Actor{
+class WidgetDeliveryServerActor(redisConf:redisConfig) extends Actor{
   var widgets = Vector.empty[Widget]
+  val r = RedisWidget(redisConf)
+  val logger: Logger = LoggerFactory.getLogger("widgetDeliveryActorLog")
+
+  override def preStart(): Unit = {
+    super.preStart()
+    r.getWidgets match {
+      case Some(w:Set[Widget]) => widgets = w.toVector
+      case None =>
+    }
+    logger.info("preStart completed")
+  }
   override def receive: Receive = {
-    case Create(postWidget)     => {
+    case WidgetsUpdate => logger.info("update completed")
+
+    case Create(postWidget)=>
       if(widgets.contains(postWidget)) WidgetExists
       else {
         widgets = widgets :+ postWidget
         sender() ! WidgetCreated(postWidget)
       }
-    }
     case Get(widgetId)    =>
       val widgetOpt: Option[Widget] = widgets.find(_.widgetId == widgetId)
       widgetOpt match {

@@ -95,10 +95,7 @@ trait RestRoutes {
         }
       } ~
       delete {
-        val response: Future[EventResponse] = safeStringToInt(param.head) match {
-          case Some(widgetId) => (widgetDeliveryServerActor ? Delete(widgetId)).mapTo[EventResponse]
-          case None           => Future(WidgetIdIsNotNumeric)
-        }
+        val response: Future[EventResponse] = (widgetDeliveryServerActor ? Delete(param.head)).mapTo[EventResponse]
         onSuccess(response) {
           case WidgetDeleted(widgetId)  => complete(StatusCodes.OK        , s"delete $widgetId widget")
           case WidgetNotFound           => complete(StatusCodes.NotFound  , "widget is not found")
